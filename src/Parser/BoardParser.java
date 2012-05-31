@@ -78,14 +78,26 @@ public class BoardParser{
 	}
 	
 	private void fillParsedBoard(BufferedReader file) {
+		int i;
 		String line;
 		String[] unparsedints;
+		int[7] parsedints;
 		Creable[6] creationarray;
-		Creable[0]= 
+		/*
+		Creable[0]=    crear clases anonimas q implementen Creable q es una interfaz con solo el metodo Create
+		Creable[1]= 	y q tengan el metodo create implementado de maneras diferentes, la 0 q sea para player,
+		Creable[2]=     osea q llame a create new player adentro, y asi las demas...
+		Creable[3]=
+		Creable[4]=
+		Creable[5]=
+		*/
 		
-		while (line=getValidLine(file)) {
+		while ( (line=getValidLine(file)) != null) {
 			unparsedints= line.split(",");
-			
+			for(i=0; i<7 ;i++) {
+				parsedints[i]=parseInt(unparsedints[i]);
+			}
+			Creable[parsedints[2]-1].create(parsedints);
 		}
 	
 	}
