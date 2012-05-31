@@ -80,6 +80,8 @@ public class BoardParser{
 	private void fillParsedBoard(BufferedReader file) {
 		String line;
 		String[] unparsedints;
+		Creable[6] creationarray;
+		Creable[0]= 
 		
 		while (line=getValidLine(file)) {
 			unparsedints= line.split(",");
