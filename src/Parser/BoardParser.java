@@ -77,22 +77,14 @@ public class BoardParser{
 		return board;
 	}
 	
-	private void createPlayer(String[] strings) {
-		int x, y;
-		if (strings.length!=7 || strings[3]!=0 || strings[4]!=0 || strings[5]!=0 || strings[6]!=0)
-			throw new IllegalArgumentException();
-		y=Integer.parseInt(strings[0]);
-		x=Integer.parseInt(strings[1]);
-		if( /* parsedboard.PlayerPosition != -1 && */ x>=0 && y>=0 /* && x<=parsedboard.getsizeX-2 && y<=parsedboard.getsizeY-2 */)
-			parsedboard.at(x+1,y+1).put(new Player()); /* Revisar el constructor y demas */
-	}
-	
-	
-	
 	private void fillParsedBoard(BufferedReader file) {
 		String line;
+		String[] unparsedints;
 		
-		while (line=getValidLine(file))
+		while (line=getValidLine(file)) {
+			unparsedints= line.split(",");
+			
+		}
 	
 	}
 	
