@@ -4,28 +4,40 @@ import java.awt.Color;
 
 public class Box extends Elem {
 
+	
+	
 	private Color color;
 	private boolean onTarget;
 	
 	
-	public Box(Color color){
-		this.color=color;
+	public Box(int r, int g, int b){
+		this(new Color(r,g,b));
 	}
+	
+	
+	public Box(Color color){
+		this.color = color;
+	}
+	
 	
 	
 	@Override
-	public boolean interact(EmptyCell ec, Point position, Direction direction) {
-		return ec.interact(this, position, direction);
+	public boolean move(EmptyCell ec, Direction direction, int might) {
+		if(might <= 0)
+			return false;
+		return ec.keepMoving(ec, direction, might-1);
 	}
 		
 	
-	private boolean interact(Player player, Direction direction){
-		return true;
-	}
 	
-	private boolean interact(Box box, Direction direction){
-		return false;
-	}
+//	public boolean interact(Player player, EmptyCell ec, Direction direction, int might){
+//		
+//	}
+//	
+//	
+//	public boolean interact(Box box, EmptyCell ec, Direction direction, int might){
+//		
+//	}
 	
 
 	public Color getColor(){

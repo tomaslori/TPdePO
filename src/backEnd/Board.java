@@ -3,20 +3,20 @@ package backEnd;
 import java.util.LinkedList;
 import java.util.List;
 
-import javax.swing.text.Position;
-
 
 public class Board {
 	
-	private Cell [][] board;
+	private EmptyCell [][] board;
 	private Point playerPosition;
-	private List boxes= new LinkedList();
-	private int remainingTargets; 
+	private Player player;
+	private List<Box> boxes= new LinkedList<Box>();
+	private int remainingTargets;
+	private int score = 0;
 	
 	
 	
 	public Board(int rows, int cols){
-		board = new Cell[rows+1][cols+1];
+		board = new EmptyCell[rows+1][cols+1];
 		initializeLimits();
 	}
 	
@@ -32,41 +32,93 @@ public class Board {
 		}
 	}
 	
+	
+	
+	public EmptyCell calculateCell(Direction direction, int times){
+		int t = player.getMight() - times + 1;
+		Point p = playerPosition;
+		while(t>0)
+			p.moveTo(direction);
+		return at(p);
+	}
+	
+	
+	
 	/*
 	 * Mueve el objeto en la posicion indicada, en la direccion dada.
 	 */
 	public void move(Point position, Direction direction){
-		move((EmptyCell)at(position), (EmptyCell)at(position.moveTo(direction)));
+		move(at(position), at(position.moveTo(direction)));
 	}
+	
 	
 	/*
 	 * Mueve el objeto en c1 hacia c2
 	 */
-	private void move(EmptyCell ec1, EmptyCell ec2){
+	public void move(EmptyCell ec1, EmptyCell ec2){
 		ec2.setElem(ec1.getElem());
 		ec1.setElem(new EmptyElem());
 	}
 	
 	
-	public void wMove(Direction direction){
-		at(playerPosition.moveTo(direction)).moveOnIt(at(playerPosition), direction);		
+	public void move(Direction direction){
+		if(player.move(at(playerPosition), direction))
+			score++;
+	}
+	
+	public int getScore(){
+		return score;
 	}
 
 	
-	public void putAt(int row, int col, Cell c){
+	public void putAt(int row, int col, EmptyCell c){
 		board[row][col] = c;
 	}
 	
 	public void putAt(int row, int col, Elem elem){
-		((EmptyCell)at(row,col)).setElem(elem);
+		(at(row,col)).setElem(elem);
 	}
 
 	
-	public Cell at(Point p) {
+	public EmptyCell at(Point p) {
 		return this.at(p.getX(), p.getY());
 	}
 	
-	public Cell at(int row, int col){
+	public EmptyCell at(int row, int col){
 		return board[row][col];
 	}
+	
+	public void hasLose(BlackHole bh){
+		System.out.println("te caiste boludo");
+	}
+	
+	public void hasLose(BombBox bb){
+		System.out.println("booom!");
+	}
+	
+	public void decreaseRemainingTargets(){
+		remainingTargets--; 
+	}
+	
+	public void increaseRemainingTargets(){
+		remainingTargets++;
+	}
+	
+	public boolean hasWon(){
+		boolean aux = (remainingTargets == 0 && checkBoxes());
+		if(aux)
+			System.out.println("Ganaste :)");
+		return aux;
+	}
+
+
+	private boolean checkBoxes() {
+		for(Box b: boxes){
+			if(!b.onTarget())
+				return false;
+		}
+		return true;
+	}
+	
+	
 }

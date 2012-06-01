@@ -2,13 +2,24 @@ package backEnd;
 
 public class Player extends Elem{
 
-	public move(Direction direction){
-		
+	private int might;
+	
+	public Player(){
+		this(1);
+	}
+	
+	public Player(int might){
+		this.might = might;
+	}
+	
+	
+	public boolean move(EmptyCell ec, Direction direction){
+		return ec.moveOnIt(ec, direction, might);
 	}
 
-	@Override
-	public Boolean move(Cell c, Elem e, int direction) {
-		// TODO Auto-generated method stub
-		return null;
+
+	public int getMight() {
+		return might;
 	}
+
 }

@@ -1,9 +1,9 @@
 package backEnd;
 
-public class Wall extends Cell{
+public class Wall extends EmptyCell{
 
 	@Override
-	public boolean moveOnIt(Cell c, Direction direction) {
+	public boolean moveOnIt(EmptyCell c, Direction direction, int might) {
 		return false;
 	}
 	

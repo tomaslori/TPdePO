@@ -4,8 +4,8 @@ public class EmptyElem extends Elem{
 
 	
 	@Override
-	public boolean interact(EmptyCell ec, Direction direction) {
+	public boolean interact(Elem e, EmptyCell ec, Direction direction, int might) {
 		return true;
 	}
-	
+
 }
