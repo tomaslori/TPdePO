@@ -1,5 +1,13 @@
 package parser;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.awt.color.*;
+
+import backEnd.*;
+
 public class BoardParser{
 
 	Board parsedboard;
@@ -17,8 +25,9 @@ public class BoardParser{
 	 * de # y no es vacia. Ademas borra todo espacio o tabulacion si la linea era valida
 	 * @return String que sigue como linea valida en el file o null si el archivo termino 
 	 * @param file Archivo a analizar
+	 * @throws IOException 
 	 */
-	private String getValidLine(BufferedReader file) {
+	private String getValidLine(BufferedReader file) throws IOException {
 		
 		String line = file.readLine();
 		linecount++;
@@ -54,8 +63,11 @@ public class BoardParser{
 	 * @param x
 	 * @param y
 	 * @return
+	 * @throws WrongNumberOfBoardArgumentsException 
+	 * @throws BoardParamIsLTExpectedException 
+	 * @throws BoardParamIsGTExpectedException 
 	 */
-	private void validateBoardInput(String line, int x, int y) {
+	private void validateBoardInput(String line, int x, int y) throws WrongNumberOfBoardArgumentsException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException {
 		String[] strings;
 		strings = line.split(",");
 		if(strings.length == 2) {
@@ -65,20 +77,20 @@ public class BoardParser{
 			y=Integer.parseInt(strings[1]);
 		}
 		else 
-			throw new WrongNumberOfBoardArgumentsException;
+			throw new WrongNumberOfBoardArgumentsException();
 		
 		if(x<5) {
 			paramcount= 1;
-			throw new BoardParamIsLTExpectedException;
+			throw new BoardParamIsLTExpectedException();
 		}
 		else if(x>20) {
 			paramcount= 1;
-			throw new BoardParamIsGTExpectedException;
+			throw new BoardParamIsGTExpectedException();
 		}
 		else if(y<5)
-			throw new BoardParamIsLTExpectedException;
+			throw new BoardParamIsLTExpectedException();
 		else if(y>20)
-			throw new BoardParamIsGTExpectedException;
+			throw new BoardParamIsGTExpectedException();
 	}
 	
 	
@@ -86,9 +98,12 @@ public class BoardParser{
 	 * 
 	 * @param line
 	 * @return
+	 * @throws BoardParamIsGTExpectedException 
+	 * @throws BoardParamIsLTExpectedException 
+	 * @throws WrongNumberOfBoardArgumentsException 
 	 */
-	private Board createParsedBoard(String line) {
-		int x, y;
+	private Board createParsedBoard(String line) throws WrongNumberOfBoardArgumentsException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException {
+		int x=0, y=0;
 		validateBoardInput(line, x, y);
 		Board board= new Board(x,y);
 		return board;
@@ -103,17 +118,18 @@ public class BoardParser{
 		return parsedboard;
 	}
 	
-	private void playerIsPresent() {
-		if(/* Player not present */)
-			throw new MissingPlayerException;
+	private void playerIsPresent() throws MissingPlayerException {
+		if(/* Player not present */ true)
+			throw new MissingPlayerException();
 	}
 	
 	
 	/**
+	 * @throws ParamNotZeroException 
 	 * 
 	 */
-	private void validatePlayer(int[] arr) {
-		int[] zeros;
+	private void validatePlayer(int[] arr) throws ParamNotZeroException {
+		int[] zeros = new int[4];
 		zeros[0]=3;
 		zeros[1]=4;
 		zeros[2]=5;
@@ -122,41 +138,48 @@ public class BoardParser{
 	}
 	
 		
-	private void validateZeroFilledArguments(int[] arr, int[] indexes) {
+	private void validateZeroFilledArguments(int[] arr, int[] indexes) throws ParamNotZeroException {
 		int i;
 	
-		for(i=indexes[0]; i<indexes.lenght() ;i++) {
+		for(i=indexes[0]; i<indexes.length ;i++) {
 			paramcount=i;
 			if (arr[i] != 0)
-				throw new ParamNotZeroException;
+				throw new ParamNotZeroException();
 		}
 	}
 		
 	/**
+	 * @throws ParamIsLTExpectedException 
+	 * @throws ParamIsGTExpectedException 
 	 * 
 	 */
-	private void validColors(int[] arr) {
+	private void validColors(int[] arr) throws ParamIsLTExpectedException, ParamIsGTExpectedException {
 		int i;
 		
 		for(i=4; i<7 ;i++) {
 			paramcount= i;
 			if(arr[i]<0)
-				throw new ParamIsLTExpectedException;
+				throw new ParamIsLTExpectedException();
 			else if (arr[i]>255)
-				throw new ParamIsGTExpectedException;
+				throw new ParamIsGTExpectedException();
+		}
 	}
 	
 	
 	/**
 	 * 
 	 * @param file
+	 * @throws WrongNumberOfArgumentsException 
+	 * @throws IOException 
+	 * @throws NumberFormatException 
+	 * @throws MissingPlayerException 
 	 */
-	private void fillParsedBoard(BufferedReader file) {
+	private void fillParsedBoard(BufferedReader file) throws WrongNumberOfArgumentsException, NumberFormatException, IOException, MissingPlayerException {
 		int i;
 		String line;
 		String[] unparsedints;
-		int[] parsedints;
-		Creable[] creationarray;
+		int[] parsedints= new int[7];
+		Creable[] creationarray= new Creable[6];
 
 		creationarray[0]= new Creable() {
 			@Override
@@ -168,15 +191,15 @@ public class BoardParser{
 		creationarray[1]= new Creable() {
 			@Override
 			public void create(int[] arr) {
-				validateBox(arr);
-				Box b= new Box(arr[4], arr[5], arr[6]);
+				Color c= validateBox(arr);
+				Box b= new Box(c);
 			}
 		};
 		creationarray[2]= new Creable() {
 			@Override
 			public void create(int[] arr) {
-				validateTarget(arr);
-				Target t=new Target(arr[4], arr[5], arr[6]);
+				Color c= validateTarget(arr);
+				Target t=new Target(c);
 			}
 		};
 		creationarray[3]= new Creable() {
@@ -196,15 +219,15 @@ public class BoardParser{
 		creationarray[5]= new Creable() {
 			@Override
 			public void create(int[] arr) {
-				validateBombBox(arr);
-				BombBox bb= new BombBox(arr[3], arr[4], arr[5], arr[6]);
+				Color c= validateBombBox(arr);
+				BombBox bb= new BombBox(arr[3],c);
 			}
 		};
 		
 		while ( (line=getValidLine(file)) != null) {
 			unparsedints= line.split(",");
 			if(unparsedints.length != 7)
-				throw new WrongNumberOfArgumentsException;
+				throw new WrongNumberOfArgumentsException();
 			for(i=0; i<7 ;i++) {
 				paramcount= i;
 				parsedints[i]= Integer.parseInt(unparsedints[i]);
@@ -216,18 +239,26 @@ public class BoardParser{
 	
 	
 	/**
+	 * @throws IncorrectFileExtensionException 
+	 * @throws EmptyFileException 
+	 * @throws IOException 
+	 * @throws BoardParamIsGTExpectedException 
+	 * @throws BoardParamIsLTExpectedException 
+	 * @throws WrongNumberOfArgumentsException 
+	 * @throws NumberFormatException 
+	 * @throws MissingPlayerException 
 	 * 
 	 * 
 	 */
-	public void parse() {
+	public void parse() throws IncorrectFileExtensionException, EmptyFileException, IOException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException, NumberFormatException, WrongNumberOfArgumentsException, MissingPlayerException {
 		BufferedReader file;
 		String line;
 
 		if(!filename.endsWith(".txt"))
-			throw new IncorrectFileExtensionException;
+			throw new IncorrectFileExtensionException();
 		file= new BufferedReader(new FileReader(filename));
 		if ( (line= getValidLine(file)) == null)
-			throw new EmptyFileException;
+			throw new EmptyFileException();
 		parsedboard= createParsedBoard(line);
 		fillParsedBoard(file);
 	}
