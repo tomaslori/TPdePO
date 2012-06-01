@@ -1,22 +1,5 @@
 package Parser;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-
-import src.Board;
-import src.Destiny;
-import src.DoubleMirror;
-import src.Filter;
-import src.MobileOrigin;
-import src.Nothing;
-import src.Origin;
-import src.SemiMirror;
-import src.SimpleMirror;
-import src.Wall;
-
-
 public class BoardParser{
 
 	Board parsedboard;
@@ -35,7 +18,7 @@ public class BoardParser{
 	 * @return String que sigue como linea valida en el file o null si el archivo termino 
 	 * @param file Archivo a analizar
 	 */
-	public String getValidLine(BufferedReader file) throws IOException{
+	private String getValidLine(BufferedReader file) {
 		
 		String line = file.readLine();
 		linecount++;
@@ -56,7 +39,7 @@ public class BoardParser{
 	 * @param line
 	 * @return	String sin espacios ni tabulaciones
 	 */
-	public String clearSpaceAndTabs(String line) {
+	private String clearSpaceAndTabs(String line) {
 		if (!line.isEmpty())	{
 			line = line.replace(" ","");
 			line = line.replace("	","");
@@ -82,20 +65,20 @@ public class BoardParser{
 			y=Integer.parseInt(strings[1]);
 		}
 		else 
-			throw new WrongNumberOfBoardArguments;
+			throw new WrongNumberOfBoardArgumentsException;
 		
 		if(x<5) {
 			paramcount= 1;
-			throw new BoardParamIsLTExpected;
+			throw new BoardParamIsLTExpectedException;
 		}
 		else if(x>20) {
 			paramcount= 1;
-			throw new BoardParamIsGTExpected;
+			throw new BoardParamIsGTExpectedException;
 		}
 		else if(y<5)
-			throw new BoardParamIsLTExpected;
+			throw new BoardParamIsLTExpectedException;
 		else if(y>20)
-			throw new BoardParamIsGTExpected;
+			throw new BoardParamIsGTExpectedException;
 	}
 	
 	
@@ -120,6 +103,49 @@ public class BoardParser{
 		return parsedboard;
 	}
 	
+	private void playerIsPresent() {
+		if(/* Player not present */)
+			throw new MissingPlayerException;
+	}
+	
+	
+	/**
+	 * 
+	 */
+	private void validatePlayer(int[] arr) {
+		int[] zeros;
+		zeros[0]=3;
+		zeros[1]=4;
+		zeros[2]=5;
+		zeros[3]=6;
+		validateZeroFilledArguments(arr, zeros);
+	}
+	
+		
+	private void validateZeroFilledArguments(int[] arr, int[] indexes) {
+		int i;
+	
+		for(i=indexes[0]; i<indexes.lenght() ;i++) {
+			paramcount=i;
+			if (arr[i] != 0)
+				throw new ParamNotZeroException;
+		}
+	}
+		
+	/**
+	 * 
+	 */
+	private void validColors(int[] arr) {
+		int i;
+		
+		for(i=4; i<7 ;i++) {
+			paramcount= i;
+			if(arr[i]<0)
+				throw new ParamIsLTExpectedException;
+			else if (arr[i]>255)
+				throw new ParamIsGTExpectedException;
+	}
+	
 	
 	/**
 	 * 
@@ -135,43 +161,43 @@ public class BoardParser{
 		creationarray[0]= new Creable() {
 			@Override
 			public void create(int[] arr) {
-				if(/* se cumplen ciertas condiciones*/ true)
-					new Player(arr[0], arr[1]);
+				validatePlayer(arr);
+				Player p= new Player();
 			}
 		};
 		creationarray[1]= new Creable() {
 			@Override
 			public void create(int[] arr) {
-				if(/* se cumplen ciertas condiciones*/ true)
-					new Box(arr[0], arr[1], arr[4], arr[5], arr[6]);
+				validateBox(arr);
+				Box b= new Box(arr[4], arr[5], arr[6]);
 			}
 		};
 		creationarray[2]= new Creable() {
 			@Override
 			public void create(int[] arr) {
-				if(/* se cumplen ciertas condiciones*/ true)
-					new Target(arr[0], arr[1], arr[4], arr[5], arr[6]);
+				validateTarget(arr);
+				Target t=new Target(arr[4], arr[5], arr[6]);
 			}
 		};
 		creationarray[3]= new Creable() {
 			@Override
 			public void create(int[] arr) {
-				if(/* se cumplen ciertas condiciones*/ true)
-					new Wall(arr[0], arr[1]);
+				validateWall(arr);
+				Wall w= new Wall();
 			}
 		};
 		creationarray[4]= new Creable() {
 			@Override
 			public void create(int[] arr) {
-				if(/* se cumplen ciertas condiciones*/ true)
-					new BlackHole(arr[0], arr[1]);
+				validateBlackHole(arr);
+				BlackHole bh= new BlackHole();
 			}
 		};
 		creationarray[5]= new Creable() {
 			@Override
 			public void create(int[] arr) {
-				if(/* se cumplen ciertas condiciones*/ true)
-					new BombBox(arr[0], arr[1], arr[3], arr[4], arr[5], arr[6]);
+				validateBombBox(arr);
+				BombBox bb= new BombBox(arr[3], arr[4], arr[5], arr[6]);
 			}
 		};
 		
@@ -180,35 +206,30 @@ public class BoardParser{
 			if(unparsedints.length != 7)
 				throw new WrongNumberOfArgumentsException;
 			for(i=0; i<7 ;i++) {
+				paramcount= i;
 				parsedints[i]= Integer.parseInt(unparsedints[i]);
 			}
 			creationarray[parsedints[2]-1].create(parsedints);
 		}
-	
+		playerIsPresent();
 	}
 	
 	
 	/**
 	 * 
+	 * 
 	 */
 	public void parse() {
 		BufferedReader file;
 		String line;
-		
-		try{
-			if(!filename.endsWith(".txt"))
-				throw new IncorrectFileExtensionException;
-			file= new BufferedReader(new FileReader(filename));
-			if ( (line= getValidLine(file)) == null)
-				throw new EmptyFileException();
-			parsedboard= createParsedBoard(line);
-			fillParsedBoard(file);
 
-		} 
-		catch (IllegalArgumentException e) {
-			
-		}
+		if(!filename.endsWith(".txt"))
+			throw new IncorrectFileExtensionException;
+		file= new BufferedReader(new FileReader(filename));
+		if ( (line= getValidLine(file)) == null)
+			throw new EmptyFileException();
+		parsedboard= createParsedBoard(line);
+		fillParsedBoard(file);
 	}
 	
-
 }
