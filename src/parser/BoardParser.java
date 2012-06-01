@@ -1,4 +1,4 @@
-package Parser;
+package parser;
 
 public class BoardParser{
 
@@ -227,7 +227,7 @@ public class BoardParser{
 			throw new IncorrectFileExtensionException;
 		file= new BufferedReader(new FileReader(filename));
 		if ( (line= getValidLine(file)) == null)
-			throw new EmptyFileException();
+			throw new EmptyFileException;
 		parsedboard= createParsedBoard(line);
 		fillParsedBoard(file);
 	}
