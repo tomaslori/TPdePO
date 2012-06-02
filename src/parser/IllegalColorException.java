@@ -1,6 +1,6 @@
 package parser;
 
-public class WrongNumberOfArgumentsException extends ParserException{
+public class IllegalColorException extends ParserException {
 
 	private static final long serialVersionUID = 1L;
 

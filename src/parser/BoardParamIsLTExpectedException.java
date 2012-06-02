@@ -1,6 +1,6 @@
 package parser;
 
-public class BoardParamIsLTExpectedException extends ParamIsLTExpectedException {
+public class BoardParamIsLTExpectedException extends ParserException {
 
 	private static final long serialVersionUID = 1L;
 

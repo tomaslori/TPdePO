@@ -1,5 +1,5 @@
 package parser;
 
 public interface Creable {
-	public void create(int[] arreglo);
+	public void create(int[] arreglo) throws ParamNotZeroException, IllegalColorException ;
 }

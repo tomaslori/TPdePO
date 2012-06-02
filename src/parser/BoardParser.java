@@ -1,11 +1,9 @@
 package parser;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.awt.color.*;
-
+import java.awt.Color;
 import backEnd.*;
 
 public class BoardParser{
@@ -137,6 +135,37 @@ public class BoardParser{
 		validateZeroFilledArguments(arr, zeros);
 	}
 	
+	private Color validateBox(int[] arr) throws ParamNotZeroException, IllegalColorException {
+
+		if(arr[3] != 0) {
+			paramcount= 3;
+			throw new ParamNotZeroException();
+		}
+		return validateBombBox(arr);
+	}
+	
+	private Color validateTarget(int[] arr) throws ParamNotZeroException, IllegalColorException {
+	
+		return validateBox(arr);
+	}
+	
+	private void validateWall(int[] arr) throws ParamNotZeroException {
+	
+		validatePlayer(arr);
+	}
+	
+	private void validateBlackHole(int[] arr) throws ParamNotZeroException {
+		
+		validateWall(arr);
+	}
+	
+	private Color validateBombBox(int[] arr) throws ParamNotZeroException, IllegalColorException {
+		Color c;
+		try{ c=new Color(arr[4], arr[5], arr[6]); }
+		catch (IllegalArgumentException e) { throw new IllegalColorException(); }
+		return c;	
+	}
+		
 		
 	private void validateZeroFilledArguments(int[] arr, int[] indexes) throws ParamNotZeroException {
 		int i;
@@ -149,24 +178,6 @@ public class BoardParser{
 	}
 		
 	/**
-	 * @throws ParamIsLTExpectedException 
-	 * @throws ParamIsGTExpectedException 
-	 * 
-	 */
-	private void validColors(int[] arr) throws ParamIsLTExpectedException, ParamIsGTExpectedException {
-		int i;
-		
-		for(i=4; i<7 ;i++) {
-			paramcount= i;
-			if(arr[i]<0)
-				throw new ParamIsLTExpectedException();
-			else if (arr[i]>255)
-				throw new ParamIsGTExpectedException();
-		}
-	}
-	
-	
-	/**
 	 * 
 	 * @param file
 	 * @throws WrongNumberOfArgumentsException 
@@ -174,7 +185,7 @@ public class BoardParser{
 	 * @throws NumberFormatException 
 	 * @throws MissingPlayerException 
 	 */
-	private void fillParsedBoard(BufferedReader file) throws WrongNumberOfArgumentsException, NumberFormatException, IOException, MissingPlayerException {
+	private void fillParsedBoard(BufferedReader file) throws WrongNumberOfArgumentsException, NumberFormatException, IOException, MissingPlayerException, ParamNotZeroException, IllegalColorException {
 		int i;
 		String line;
 		String[] unparsedints;
@@ -183,44 +194,50 @@ public class BoardParser{
 
 		creationarray[0]= new Creable() {
 			@Override
-			public void create(int[] arr) {
+			public void create(int[] arr) throws ParamNotZeroException {
 				validatePlayer(arr);
 				Player p= new Player();
+				/* set player */
 			}
 		};
 		creationarray[1]= new Creable() {
 			@Override
-			public void create(int[] arr) {
+			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException {
 				Color c= validateBox(arr);
 				Box b= new Box(c);
+				/* set box */
 			}
 		};
 		creationarray[2]= new Creable() {
 			@Override
-			public void create(int[] arr) {
+			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException {
 				Color c= validateTarget(arr);
 				Target t=new Target(c);
+				/* set target */
 			}
 		};
 		creationarray[3]= new Creable() {
 			@Override
-			public void create(int[] arr) {
+			public void create(int[] arr) throws ParamNotZeroException {
 				validateWall(arr);
 				Wall w= new Wall();
+				/* set wall */
 			}
 		};
 		creationarray[4]= new Creable() {
 			@Override
-			public void create(int[] arr) {
+			public void create(int[] arr) throws ParamNotZeroException {
 				validateBlackHole(arr);
 				BlackHole bh= new BlackHole();
+				/* set blackhole */
 			}
 		};
 		creationarray[5]= new Creable() {
 			@Override
-			public void create(int[] arr) {
+			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException {
 				Color c= validateBombBox(arr);
-				BombBox bb= new BombBox(arr[3],c);
+				BombBox bb= new BombBox(c,arr[3]);
+				/* set bombbox */
 			}
 		};
 		
@@ -247,10 +264,12 @@ public class BoardParser{
 	 * @throws WrongNumberOfArgumentsException 
 	 * @throws NumberFormatException 
 	 * @throws MissingPlayerException 
+	 * @throws IllegalColorException 
+	 * @throws ParamNotZeroException 
 	 * 
 	 * 
 	 */
-	public void parse() throws IncorrectFileExtensionException, EmptyFileException, IOException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException, NumberFormatException, WrongNumberOfArgumentsException, MissingPlayerException {
+	public void parse() throws IncorrectFileExtensionException, EmptyFileException, IOException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException, NumberFormatException, WrongNumberOfArgumentsException, MissingPlayerException, ParamNotZeroException, IllegalColorException {
 		BufferedReader file;
 		String line;
 

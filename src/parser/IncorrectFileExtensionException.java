@@ -1,6 +1,6 @@
 package parser;
 
-public class IncorrectFileExtensionException extends Exception {
+public class IncorrectFileExtensionException extends ParserException {
 
 	private static final long serialVersionUID = 1L;
 
