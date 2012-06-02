@@ -32,6 +32,10 @@ public class Board {
 		}
 	}
 	
+	public Boolean isPlayerPresent() {
+		
+		return (playerPosition != null);
+	}
 	
 	
 	public EmptyCell calculateCell(Direction direction, int times){
@@ -75,8 +79,18 @@ public class Board {
 		board[row][col] = c;
 	}
 	
+	public void vPutAt(int row, int col, EmptyCell c) {
+		/* Validate position or throw Exception */
+		putAt(row, col, c);
+	}
+	
 	public void putAt(int row, int col, Elem elem){
 		(at(row,col)).setElem(elem);
+	}
+	
+	public void vPutAt(int row, int col, Elem elem) {
+		/* Validate position or throw Exception */
+		putAt(row, col, elem);
 	}
 
 	

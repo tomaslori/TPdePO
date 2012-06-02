@@ -116,9 +116,15 @@ public class BoardParser{
 		return parsedboard;
 	}
 	
-	private void playerIsPresent() throws MissingPlayerException {
-		if(/* Player not present */ true)
+	private void isPlayerPresent() throws MissingPlayerException {
+		if (parsedboard.isPlayerPresent())
 			throw new MissingPlayerException();
+	}
+	
+	private void isPlayerAbscent() throws PlayerAlreadyDeclaredException {
+		try{ isPlayerPresent(); }
+		catch (MissingPlayerException e) {  ; }
+		throw new PlayerAlreadyDeclaredException();
 	}
 	
 	
@@ -184,8 +190,9 @@ public class BoardParser{
 	 * @throws IOException 
 	 * @throws NumberFormatException 
 	 * @throws MissingPlayerException 
+	 * @throws PlayerAlreadyDeclaredException 
 	 */
-	private void fillParsedBoard(BufferedReader file) throws WrongNumberOfArgumentsException, NumberFormatException, IOException, MissingPlayerException, ParamNotZeroException, IllegalColorException {
+	private void fillParsedBoard(BufferedReader file) throws WrongNumberOfArgumentsException, NumberFormatException, IOException, MissingPlayerException, ParamNotZeroException, IllegalColorException, PlayerAlreadyDeclaredException {
 		int i;
 		String line;
 		String[] unparsedints;
@@ -194,10 +201,11 @@ public class BoardParser{
 
 		creationarray[0]= new Creable() {
 			@Override
-			public void create(int[] arr) throws ParamNotZeroException {
+			public void create(int[] arr) throws ParamNotZeroException, PlayerAlreadyDeclaredException {
 				validatePlayer(arr);
+				isPlayerAbscent();
 				Player p= new Player();
-				/* set player */
+				parsedboard.vPutAt(arr[0], arr[1], p);
 			}
 		};
 		creationarray[1]= new Creable() {
@@ -205,7 +213,7 @@ public class BoardParser{
 			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException {
 				Color c= validateBox(arr);
 				Box b= new Box(c);
-				/* set box */
+				parsedboard.vPutAt(arr[0], arr[1], b);
 			}
 		};
 		creationarray[2]= new Creable() {
@@ -213,7 +221,7 @@ public class BoardParser{
 			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException {
 				Color c= validateTarget(arr);
 				Target t=new Target(c);
-				/* set target */
+				parsedboard.vPutAt(arr[0], arr[1], t);
 			}
 		};
 		creationarray[3]= new Creable() {
@@ -221,7 +229,7 @@ public class BoardParser{
 			public void create(int[] arr) throws ParamNotZeroException {
 				validateWall(arr);
 				Wall w= new Wall();
-				/* set wall */
+				parsedboard.vPutAt(arr[0], arr[1], w);
 			}
 		};
 		creationarray[4]= new Creable() {
@@ -229,7 +237,7 @@ public class BoardParser{
 			public void create(int[] arr) throws ParamNotZeroException {
 				validateBlackHole(arr);
 				BlackHole bh= new BlackHole();
-				/* set blackhole */
+				parsedboard.vPutAt(arr[0], arr[1], bh);
 			}
 		};
 		creationarray[5]= new Creable() {
@@ -237,7 +245,7 @@ public class BoardParser{
 			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException {
 				Color c= validateBombBox(arr);
 				BombBox bb= new BombBox(c,arr[3]);
-				/* set bombbox */
+				parsedboard.vPutAt(arr[0], arr[1], bb);
 			}
 		};
 		
@@ -251,7 +259,7 @@ public class BoardParser{
 			}
 			creationarray[parsedints[2]-1].create(parsedints);
 		}
-		playerIsPresent();
+		isPlayerPresent();
 	}
 	
 	
@@ -266,10 +274,11 @@ public class BoardParser{
 	 * @throws MissingPlayerException 
 	 * @throws IllegalColorException 
 	 * @throws ParamNotZeroException 
+	 * @throws PlayerAlreadyDeclaredException 
 	 * 
 	 * 
 	 */
-	public void parse() throws IncorrectFileExtensionException, EmptyFileException, IOException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException, NumberFormatException, WrongNumberOfArgumentsException, MissingPlayerException, ParamNotZeroException, IllegalColorException {
+	public void parse() throws IncorrectFileExtensionException, EmptyFileException, IOException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException, NumberFormatException, WrongNumberOfArgumentsException, MissingPlayerException, ParamNotZeroException, IllegalColorException, PlayerAlreadyDeclaredException {
 		BufferedReader file;
 		String line;
 
