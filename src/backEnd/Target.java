@@ -14,10 +14,9 @@ public class Target extends EmptyCell {
 	
 	@Override
 	public boolean moveOnIt(EmptyCell ec, Direction direction) {
-		
 		boolean aux = super.moveOnIt(ec, direction);
 		if(aux)
-			interact(ec.getElem());
+			interact((Box)onIt);
 		return aux;
 		
 	}
@@ -30,20 +29,13 @@ public class Target extends EmptyCell {
 	}
 	
 	
-	
+	@Override
 	public void interact(Box b) {
-		if(b.getColor() == color){
-			board.decreaseRemainingTargets();
+		if(b.getColor().equals(color)){
 			b.setOnTarget(true);
+			board.decreaseRemainingTargets();
 		}
-	}
-	
-	
-	
-	public void interact(Player pl){
-	}
-	 
-	
+	}	
 
 	
 	public String toString(){

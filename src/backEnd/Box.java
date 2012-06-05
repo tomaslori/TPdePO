@@ -50,6 +50,7 @@ public class Box extends Elem {
 
 	public void setOnTarget(boolean b){
 		onTarget = b;
+		System.out.println("BOX ONTARGET: " + onTarget);
 	}
 
 
@@ -64,6 +65,10 @@ public class Box extends Elem {
 	
 	public void doubleDispatching(BlackHole bh){
 		bh.interact(this);
+	}
+	
+	public void doubleDispatching(Target target){
+		target.interact(this);
 	}
 	
 	@Override

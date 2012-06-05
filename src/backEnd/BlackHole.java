@@ -7,8 +7,7 @@ public class BlackHole extends Cell {
 
 	@Override
 	public boolean moveOnIt(EmptyCell ec, Direction direction) {
-		Elem elem = ec.getElem();
-		elem.doubleDispatching(this);
+		ec.getElem().doubleDispatching(this);
 		board.swap(ec, this);
 		return true;
 	}

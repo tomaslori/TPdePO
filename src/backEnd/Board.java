@@ -11,6 +11,7 @@ public class Board {
 	private List<Box> boxes= new LinkedList<Box>();
 	private int remainingTargets=0;
 	private int score = 0;
+	private  boolean finishedGame = false;
 
 	
 	public Board(int rows, int cols) {
@@ -91,14 +92,14 @@ public class Board {
 	
 	
 	public boolean move(Direction direction) {
-		boolean b;
-		System.out.println("SIZE" + boxes.size());
-		if(b = pAt(playerPosition.moveTo(direction)).moveOnIt((EmptyCell)pAt(playerPosition), direction)){
+		boolean b = false;;
+		if(!finishedGame && (b = pAt(playerPosition.moveTo(direction)).moveOnIt((EmptyCell)pAt(playerPosition), direction))){
 			score++;
 			playerPosition = playerPosition.moveTo(direction);
 		}
-		System.out.println("Posicion:" + playerPosition);
-		System.out.println("SCORE: " + score);
+		for(Box box: boxes){
+			System.out.println("BOX " + box + "   OnTARGET:   " + box.onTarget());
+		}
 		return b;
 	}
 	
@@ -176,17 +177,11 @@ public class Board {
 	}
 	
 	
-	public void hasLost(BlackHole bh) {
-		System.out.println("te caiste boludo");
-	}
-	
-	
-	public void hasLost(BombBox bb) {
-	}
 	
 	
 	public void decreaseRemainingTargets(){
-		remainingTargets--; 
+		remainingTargets--;
+		hasWon();
 	}
 	
 	
@@ -197,11 +192,27 @@ public class Board {
 	
 	public boolean hasWon() {
 		boolean aux = (remainingTargets == 0 && checkBoxes());
-		if(aux)
+		if(aux){
 			System.out.println("Ganaste :)");
+			finishedGame = true;
+		}
 		return aux;
 	}
 
+	public void hasLost(BlackHole bh) {
+		System.out.println("te caiste");
+		hasLost();
+	}
+	
+	
+	public void hasLost(BombBox bb) {
+		System.out.println("BOOOM!");
+		hasLost();
+	}
+	
+	private void hasLost(){
+		finishedGame = true;
+	}
 
 	private boolean checkBoxes() {
 		for(Box b: boxes){
@@ -215,6 +226,7 @@ public class Board {
 
 	public void deleteBox(Box box) {
 		boxes.remove(box);
+		hasWon();
 	}
 	
 	

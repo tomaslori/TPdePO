@@ -20,9 +20,10 @@ public class BombBox extends Box {
 	@Override
 	public boolean move(EmptyCell ec, Direction direction) {
 		boolean aux = super.move(ec, direction);
-		if(aux)
+		if(aux) {
 			if(--times <= 0)
 				ec.alert(this);
+		}
 		return aux;
 	}
 	

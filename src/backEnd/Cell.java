@@ -28,8 +28,6 @@ public abstract class Cell {
 
 
 	public void interact(Elem elem) {
-		// TODO Auto-generated method stub
-		
 	}
 	
 }

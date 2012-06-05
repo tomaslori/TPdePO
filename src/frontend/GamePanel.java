@@ -38,9 +38,11 @@ public class GamePanel extends JPanel {
 	 */
 	private static final long serialVersionUID = 1L;
 //	To do try catch
-	private static final int CELL_SIZE = 30;
+	private static final int CELL_SIZE = 32;
 	private HashMap<String, Image> images = new HashMap<String, Image>(); 
 	private BoardPanel boardP;
+	private JLabel score;
+	private JPanel stats;
 	
 	
 	
@@ -58,11 +60,12 @@ public class GamePanel extends JPanel {
 		
 		try{
 			images.put("backEnd.Box",ImageUtils.loadImage("resources/box.png"));
-			images.put("backEnd.BombBox",ImageUtils.loadImage("resources/box2.png"));
-			images.put("backEnd.BlackHole",ImageUtils.loadImage("resources/hole.png"));
+			images.put("backEnd.BombBox",ImageUtils.loadImage("resources/box.png"));
+			images.put("backEnd.BlackHole",ImageUtils.loadImage("resources/hole2.png"));
 			images.put("backEnd.Player",ImageUtils.loadImage("resources/smile.gif"));
-			images.put("backEnd.Target",ImageUtils.loadImage("resources/target.png"));
-			images.put("backEnd.Wall",ImageUtils.loadImage("resources/wall.jpg"));
+			images.put("backEnd.Target",ImageUtils.loadImage("resources/wood.png"));
+			images.put("backEnd.Wall",ImageUtils.loadImage("resources/wall2.png"));
+			images.put("backEnd.EmptyCell",ImageUtils.loadImage("resources/wood.png"));
 		} 
 		catch (IOException e) {
 			System.out.println("Error al cargar imagenes.");
@@ -72,14 +75,17 @@ public class GamePanel extends JPanel {
 		
 		
 		//Panel Estadísticas
-		JPanel stats = new JPanel();
+		stats = new JPanel();
 		stats.setLayout(new FlowLayout());
+		stats.setBounds(board.getRows() * CELL_SIZE + 5, 20, 100, 60);
 		
-		JLabel lscore = new JLabel("Score: " + board.getScore());
+		JLabel lscore = new JLabel("Score: ");
+		score = new JLabel(board.getScore() + "");
 		JButton restart = new JButton("Restart");
 		
 		
 		stats.add(lscore);
+		stats.add(score);
 		stats.add(restart);
 		stats.setBorder(new EtchedBorder());
 		
@@ -91,7 +97,7 @@ public class GamePanel extends JPanel {
 		boardP.setBorder(new EtchedBorder());
 		boardP.repaint();
 		add(boardP);
-		draw(board, boardP);
+		draw(board);
 		System.out.println(boardP);
 		
 		add(stats);
@@ -101,83 +107,61 @@ public class GamePanel extends JPanel {
 
 
 	}
+	
+
+	
 	public void playerMoved(Board board, Direction dir){
-		Image img;
+	
+		Point pos = board.getPlayerPosition().moveToOpposite(dir);
+		
+		int strenght = ((Player)((EmptyCell)board.at(board.getPlayerPosition())).getElem()).getStrength();
+		
+		for(int i=0;i<strenght+2;i++){
+			refreshCell(pos.getX(),pos.getY(),board);
+			pos = pos.moveTo(dir);
+			}
+		score.setText(board.getScore() + "");
+		boardP.repaint();
+	
+	}
+	
+	private void draw(Board board){
+		int rows = board.getRows();
+		int cols = board.getCols();
+				for(int i=0;i<rows;i++){
+					for(int j=0;j<cols;j++){
+						refreshCell(i,j,board);
+					}
+				}
+	}
+	
+	private void refreshCell(int i, int j, Board board){
 		Elem elem = null;
-		Point pos = board.getPlayerPosition();
-		int strenght = ((Player)((EmptyCell)board.at(pos)).getElem()).getStrength();
-		for(int i=0;i<strenght;i++){
-			int x = pos.getX();
-			int y = pos.getY();
-			
-			Cell c = board.at(pos);
-			img = images.get(c.getClass().getName());
-			
-			this.boardP.setImage(x,y,img);
+		Cell c = board.at(i,j);
+		Image img = images.get(c.getClass().getName());
+		if(c instanceof Target)
+			img = ImageUtils.colorize(img, ((Target)c).getColor());
+		boardP.setImage(i,j,img);
 			if(c instanceof EmptyCell){
 				elem = ((EmptyCell)c).getElem();
+				
 				if(!(elem instanceof EmptyElem)){
 					img = images.get(elem.getClass().getName());
 					if(elem instanceof Box) {
-							img = ImageUtils.colorize(img,((Box)elem).getColor());
-							if(elem instanceof BombBox){
-							//	TODO cambiar esto
-								img = ImageUtils.drawString(img,((BombBox)elem).getTimes() + "" , Color.WHITE);
-							}
-							if(((Box) elem).onTarget()){
-								img = ImageUtils.increaseBrightness(img);
-							}
+						img = ImageUtils.colorize(img,((Box)elem).getColor());
+						if(elem instanceof BombBox){
+							//TODO Corregir
+							img = ImageUtils.drawString(img,((BombBox)elem).getTimes() + "", Color.WHITE);
+						}	
+						if(((Box) elem).onTarget()){
+							System.out.println("LA CAJA ESTA EN EL TARGET" + elem);
+							img = ImageUtils.increaseBrightness(img);
 						}
-					this.boardP.appendImage(x,y,img);
-					
-					
 					}
-				pos = pos.moveTo(dir);
-			}
-		}
-	}
-	
-	private void draw(Board board, BoardPanel boardP){
-		int rows = board.getRows();
-		int cols = board.getCols();
-		Elem elem = null;
-
-		
-				for(int i=0;i<rows;i++){
-					for(int j=0;j<cols;j++){
-						Cell c = board.at(i,j);
-							 
-						Image img = images.get(c.getClass().getName());
-						
-						
-						if(c instanceof Target)
-							img = ImageUtils.colorize(img, ((Target)c).getColor());
-							
-						boardP.setImage(i,j,img);
-						
-						System.out.println(i+","+j);
-							if(c instanceof EmptyCell){
-								elem = ((EmptyCell)c).getElem();
-								
-								if(!(elem instanceof EmptyElem)){
-									img = images.get(elem.getClass().getName());
-									if(elem instanceof Box) {
-										img = ImageUtils.colorize(img,((Box)elem).getColor());
-										if(elem instanceof BombBox){
-											//TODO Corregir
-											img = ImageUtils.drawString(img,((BombBox)elem).getTimes() + "", Color.WHITE);
-										}	
-										if(((Box) elem).onTarget()){
-											img = ImageUtils.increaseBrightness(img);
-										}
-									}
-									boardP.appendImage(i,j,img);
-								}
-							}	
-					}
-
+					boardP.appendImage(i,j,img);
 				}
-	}	
+			}	
+	}
 		
 }
 	

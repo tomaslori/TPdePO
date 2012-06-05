@@ -194,9 +194,9 @@ public class BoardParser{
 	private void validateZeroFilledArguments(int[] arr, int[] indexes) throws ParamNotZeroException {
 		int i;
 	
-		for(i=indexes[0]; i<indexes.length ;i++) {
-			paramcount=i+1;
-			if (arr[i] != 0)
+		for(i=0; i<indexes.length ;i++) {
+			paramcount=indexes[i] +1;
+			if (arr[indexes[i]] != 0)
 				throw new ParamNotZeroException();
 		}
 	}

@@ -27,10 +27,9 @@ public class EmptyCell extends Cell{
 	
 	
 	public void interact(Box b) {
-		if(b.onTarget()){
+		if(b.onTarget())
 			board.decreaseRemainingTargets();
 			b.setOnTarget(false);
-		}
 	}
 	
 	

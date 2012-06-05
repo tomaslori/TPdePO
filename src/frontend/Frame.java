@@ -1,6 +1,7 @@
 package frontend;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
@@ -23,14 +24,6 @@ import backEnd.Board;
 import backEnd.Direction;
 
 
-
-
-
-
-
-
-
-
 public class Frame extends JFrame {
 	
 	private static final long serialVersionUID = 1L;
@@ -44,7 +37,7 @@ public class Frame extends JFrame {
 	
 		super("Sokoban");
 		setLayout(new BorderLayout());
-		setBounds(300, 300, 800,600);
+		setBounds(300, 300, 500,450);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setResizable(true);
 		
@@ -55,10 +48,10 @@ public class Frame extends JFrame {
 //		NewGame
 		JMenuItem newgame = new JMenuItem("New");
 		newgame.setMnemonic(KeyEvent.VK_N);
-		newgame.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,ActionEvent.CTRL_MASK));
+//		newgame.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N,ActionEvent.CTRL_MASK));
 		newgame.addActionListener(new ActionListener() {
 			@Override
-				public void actionPerformed(ActionEvent e) {
+				public void actionPerformed(ActionEvent e){
 				BoardParser auxp;
 				if((auxp = loadMap())!= null){
 				Board board = auxp.getParsedBoard();
@@ -66,7 +59,6 @@ public class Frame extends JFrame {
 				}
 			}	
 		});
-		
 		
 //		Open
 		open.setMnemonic(KeyEvent.VK_O);
@@ -78,7 +70,6 @@ public class Frame extends JFrame {
 			}
 		});
 		
-		
 //		Save
 		save.setMnemonic(KeyEvent.VK_S);
 		save.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S,ActionEvent.CTRL_MASK));
@@ -89,7 +80,6 @@ public class Frame extends JFrame {
 
 		}
 	});
-		
 		
 //		Quit
 		quit.setMnemonic(KeyEvent.VK_Q);
@@ -114,23 +104,21 @@ public class Frame extends JFrame {
 		MainMenu.add(file);
 		MainMenu.add(help);
 		
-		setJMenuBar(MainMenu);
-		
-
+		setJMenuBar(MainMenu);	
 	}
 	
 	
 	public static void main(String[] args){
 		Frame juego = new Frame();
 		juego.setVisible(true);
-		
 	}
 	
 /**
- * Método que carga el mapa, invocando al Parser
+ * Método que carga el mapa, invocando al Parser y revisa las excepciones
  * @return board
+ * @throws CancelException 
  */
-	private BoardParser loadMap() {
+	private BoardParser loadMap(){
 		BoardParser boardp = null;
 		String aux;
 		
@@ -140,48 +128,41 @@ public class Frame extends JFrame {
 		try {
 			boardp.parse();
 				} catch (NumberFormatException e) {
-						boardp = exception("El argumento número " + boardp.getParamNumber() + " en la línea " + boardp.getLineNumber() + " no es de tipo numerico entero.");
+						boardp = exception("El argumento número " + boardp.getParamNumber() + " no es un número en la línea: " + boardp.getLineNumber());
 					}
 				catch(IncorrectFileExtensionException e){
-						boardp = exception("La extensión del archivo es inválida, debe ser de tipo '.txt' .");
+						boardp = exception("Extensión de archivo inválida");
 					}
 				catch(BoardParamIsLTExpectedException e){
-						boardp = exception("El argumento número " + boardp.getParamNumber() + " en la línea " + boardp.getLineNumber() + " es menor al tamaño mínimo de tablero." );
+						boardp = exception("El argumento número " + boardp.getParamNumber() + "en la línea: " + boardp.getLineNumber() + " es menor al tamaño mínimo de tablero" );
 					}
 				catch(BoardParamIsGTExpectedException e){
-						boardp = exception("El argumento número " + boardp.getParamNumber() + " en la línea " + boardp.getLineNumber() + " es mayor al tamaño máximo de tablero." );
+						boardp = exception("El argumento número " + boardp.getParamNumber() + "en la línea: " + boardp.getLineNumber() + " es mayor al tamaño máximo de tablero" );
 					}
 				catch(WrongNumberOfArgumentsException e){
-						boardp = exception("Error en el número de argumentos en la linea " + boardp.getLineNumber());
+						boardp = exception("Error en el número de argumentos en la linea: " + boardp.getLineNumber());
 					}
 				catch(MissingPlayerException e){
-						boardp = exception("El archivo no declara un jugador.");
+						boardp = exception("El archivo no declara un jugador");
 					}
 				catch(ParamNotZeroException e){
-						boardp = exception("Se espera un 0 en el argumento número " + boardp.getParamNumber() + " en la línea " + boardp.getLineNumber() + ".");
+						boardp = exception("Se espera un 0 en el argumento número: " + boardp.getParamNumber() + "en la línea: " + boardp.getLineNumber() );
 					}
 				catch(IllegalColorException e){
-						boardp = exception("El color no es válido en la línea " + boardp.getLineNumber() + ".");
+						boardp = exception("El color no es válido en la línea: " + boardp.getLineNumber() );
 					}
 				catch(PlayerAlreadyDeclaredException e){
-						boardp = exception("El jugador ya fué declarado anteriormente, repetición de declaración en la linea " + boardp.getLineNumber() + ".");
+						boardp = exception("El jugador ya fué declarado anteriormente, repetición de declaración en la linea: " + boardp.getLineNumber() );
 					}
 				catch(EmptyFileException e){
-						boardp = exception("El archivo esta vacio o solo contiene comentarios.");
+						boardp = exception("El archivo esta vacio o solo contiene comentarios");
 					}
 				catch (FileNotFoundException e) {
-							boardp = exception("El archivo no existe.");
+						boardp = exception("El archivo no existe");
+					} 
+				catch (EmptyArgumentException e) {
+						boardp = exception("Un argumento esta vacio en la linea número:" + boardp.getLineNumber());
 					}
-				catch (EmptyArgumentException  e) {
-							boardp = exception("El archivo contiene un argumento vacio en la línea numero " + boardp.getLineNumber() + ".");
-					}
-				catch (ParamIsNegativeException e) {
-							boardp = exception("El argumento número " + boardp.getParamNumber() + " en la línea " + boardp.getLineNumber() + " es negativo.");
-					}
-				catch (WrongObjectTypeException  e) {
-							boardp = exception("El argumento número 3, en la línea " + boardp.getLineNumber() + " que define el tipo de objeto a crear, no posee un numero entero en el rango [1,6].");
-					}		
-
 		}
 		return boardp;
 	}
@@ -208,6 +189,11 @@ public class Frame extends JFrame {
 		return f;
 	}
 	
+	
+	/**
+	 * Método que coloca el tablero de juego y activa las teclas de movimiento
+	 * @param board
+	 */
 	private void newGame(final Board board){
 		final GamePanel juego;
 		putOnBoard(juego = new GamePanel(board));
@@ -244,7 +230,7 @@ public class Frame extends JFrame {
                  }
                 if(result){
                 	juego.playerMoved(board, dir);
-                	juego.setVisible(true);
+                	setVisible(true);
                 }
               
 			}});

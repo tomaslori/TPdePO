@@ -87,7 +87,7 @@ public class ImageUtils {
 
 		g.setColor(color);
 		g.drawString(text, img.getWidth(null) / 2 - (int) r.getWidth() / 2,
-				img.getHeight(null) / 2 + (int) r.getHeight() / 2 - 2);
+				img.getHeight(null) / 2 + (int) r.getHeight() / 2 - 0);
 		return result;
 	}
 
