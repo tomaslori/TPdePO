@@ -1,6 +1,7 @@
 package parser;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.awt.Color;
@@ -23,20 +24,25 @@ public class BoardParser{
 	 * de # y no es vacia. Ademas borra todo espacio o tabulacion si la linea era valida
 	 * @return String que sigue como linea valida en el file o null si el archivo termino 
 	 * @param file Archivo a analizar
-	 * @throws IOException 
+	 * @throws EmptyFileException 
+	 * @throws EmptyArgumentException 
 	 */
-	private String getValidLine(BufferedReader file) throws IOException {
+	private String getValidLine(BufferedReader file) throws EmptyFileException, EmptyArgumentException {
 		
-		String line = file.readLine();
-		linecount++;
-		if (line == null)
-			return null;
-		line = clearSpaceAndTabs(line); 
-		if (line.startsWith("#") || line.isEmpty())
-			return getValidLine(file); 
-		if (line.contains("#"))
-			return line.substring(0,line.indexOf('#'));
-
+		String line= null;
+		try	{ line = file.readLine();
+			if (line == null)
+				return line;
+			linecount ++;
+			line = clearSpaceAndTabs(line); 
+			if (line.startsWith("#") || line.isEmpty() )
+				return getValidLine(file);
+			if (line.contains("#"))
+				line= line.substring(0,line.indexOf('#'));
+		} catch (IOException e) { ; }
+		if(line.contains(",,") || line.endsWith(","))
+			throw new EmptyArgumentException();
+		
 		return line;
 	}
 		
@@ -47,10 +53,8 @@ public class BoardParser{
 	 * @return	String sin espacios ni tabulaciones
 	 */
 	private String clearSpaceAndTabs(String line) {
-		if (!line.isEmpty())	{
-			line = line.replace(" ","");
-			line = line.replace("	","");
-		}
+		line = line.replace(" ","");
+		line = line.replace("	","");
 		return line;
 	}
 	
@@ -65,18 +69,7 @@ public class BoardParser{
 	 * @throws BoardParamIsLTExpectedException 
 	 * @throws BoardParamIsGTExpectedException 
 	 */
-	private void validateBoardInput(String line, int x, int y) throws WrongNumberOfBoardArgumentsException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException {
-		String[] strings;
-		strings = line.split(",");
-		if(strings.length == 2) {
-			paramcount= 1;
-			x=Integer.parseInt(strings[0]);
-			paramcount= 2;
-			y=Integer.parseInt(strings[1]);
-		}
-		else 
-			throw new WrongNumberOfBoardArgumentsException();
-		
+	private void validateBoardSize(int x, int y) throws WrongNumberOfBoardArgumentsException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException {
 		if(x<5) {
 			paramcount= 1;
 			throw new BoardParamIsLTExpectedException();
@@ -85,10 +78,14 @@ public class BoardParser{
 			paramcount= 1;
 			throw new BoardParamIsGTExpectedException();
 		}
-		else if(y<5)
+		else if(y<5) {
+			paramcount= 2;
 			throw new BoardParamIsLTExpectedException();
-		else if(y>20)
+		}
+		else if(y>20) {
+			paramcount= 2;
 			throw new BoardParamIsGTExpectedException();
+		}
 	}
 	
 	
@@ -101,8 +98,19 @@ public class BoardParser{
 	 * @throws WrongNumberOfBoardArgumentsException 
 	 */
 	private Board createParsedBoard(String line) throws WrongNumberOfBoardArgumentsException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException {
-		int x=0, y=0;
-		validateBoardInput(line, x, y);
+		int x, y;
+		String[] strings;
+		strings = line.split(",");
+		if(strings.length == 2) {
+			paramcount= 1;
+			x=Integer.parseInt(strings[0]);
+			paramcount= 2;
+			y=Integer.parseInt(strings[1]);
+		}
+		else 
+			throw new WrongNumberOfBoardArgumentsException();
+
+		validateBoardSize(x,y);
 		Board board= new Board(x,y);
 		return board;
 	}
@@ -117,16 +125,22 @@ public class BoardParser{
 	}
 	
 	private void isPlayerPresent() throws MissingPlayerException {
-		if (parsedboard.isPlayerPresent())
+		if (! parsedboard.isPlayerPresent())
 			throw new MissingPlayerException();
 	}
 	
 	private void isPlayerAbscent() throws PlayerAlreadyDeclaredException {
-		try{ isPlayerPresent(); }
-		catch (MissingPlayerException e) {  ; }
-		throw new PlayerAlreadyDeclaredException();
+		if (parsedboard.isPlayerPresent())
+			throw new PlayerAlreadyDeclaredException();
 	}
 	
+	public int getParamNumber() {
+		return paramcount;
+	}
+	
+	public int getLineNumber() {
+		return linecount;
+	}
 	
 	/**
 	 * @throws ParamNotZeroException 
@@ -141,16 +155,16 @@ public class BoardParser{
 		validateZeroFilledArguments(arr, zeros);
 	}
 	
-	private Color validateBox(int[] arr) throws ParamNotZeroException, IllegalColorException {
+	private Color validateBox(int[] arr) throws ParamNotZeroException, IllegalColorException, ParamIsNegativeException {
 
 		if(arr[3] != 0) {
-			paramcount= 3;
+			paramcount= 4;
 			throw new ParamNotZeroException();
 		}
 		return validateBombBox(arr);
 	}
 	
-	private Color validateTarget(int[] arr) throws ParamNotZeroException, IllegalColorException {
+	private Color validateTarget(int[] arr) throws ParamNotZeroException, IllegalColorException, ParamIsNegativeException {
 	
 		return validateBox(arr);
 	}
@@ -165,10 +179,14 @@ public class BoardParser{
 		validateWall(arr);
 	}
 	
-	private Color validateBombBox(int[] arr) throws ParamNotZeroException, IllegalColorException {
+	private Color validateBombBox(int[] arr) throws ParamNotZeroException, IllegalColorException, ParamIsNegativeException {
 		Color c;
 		try{ c=new Color(arr[4], arr[5], arr[6]); }
 		catch (IllegalArgumentException e) { throw new IllegalColorException(); }
+		if(arr[3]<0) {
+			paramcount=4;
+			throw new ParamIsNegativeException();
+		}
 		return c;	
 	}
 		
@@ -177,7 +195,7 @@ public class BoardParser{
 		int i;
 	
 		for(i=indexes[0]; i<indexes.length ;i++) {
-			paramcount=i;
+			paramcount=i+1;
 			if (arr[i] != 0)
 				throw new ParamNotZeroException();
 		}
@@ -187,12 +205,15 @@ public class BoardParser{
 	 * 
 	 * @param file
 	 * @throws WrongNumberOfArgumentsException 
-	 * @throws IOException 
 	 * @throws NumberFormatException 
 	 * @throws MissingPlayerException 
 	 * @throws PlayerAlreadyDeclaredException 
+	 * @throws EmptyFileException 
+	 * @throws EmptyArgumentException 
+	 * @throws ParamIsNegativeException 
+	 * @throws WrongObjectTypeParam 
 	 */
-	private void fillParsedBoard(BufferedReader file) throws WrongNumberOfArgumentsException, NumberFormatException, IOException, MissingPlayerException, ParamNotZeroException, IllegalColorException, PlayerAlreadyDeclaredException {
+	private void fillParsedBoard(BufferedReader file) throws WrongNumberOfArgumentsException, NumberFormatException, MissingPlayerException, ParamNotZeroException, IllegalColorException, PlayerAlreadyDeclaredException, EmptyFileException, EmptyArgumentException, ParamIsNegativeException, WrongObjectTypeParam {
 		int i;
 		String line;
 		String[] unparsedints;
@@ -210,7 +231,7 @@ public class BoardParser{
 		};
 		creationarray[1]= new Creable() {
 			@Override
-			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException {
+			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException, ParamIsNegativeException {
 				Color c= validateBox(arr);
 				Box b= new Box(c);
 				parsedboard.vPutAt(arr[0], arr[1], b);
@@ -218,7 +239,7 @@ public class BoardParser{
 		};
 		creationarray[2]= new Creable() {
 			@Override
-			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException {
+			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException, ParamIsNegativeException {
 				Color c= validateTarget(arr);
 				Target t=new Target(c);
 				parsedboard.vPutAt(arr[0], arr[1], t);
@@ -242,7 +263,7 @@ public class BoardParser{
 		};
 		creationarray[5]= new Creable() {
 			@Override
-			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException {
+			public void create(int[] arr) throws ParamNotZeroException, IllegalColorException, ParamIsNegativeException {
 				Color c= validateBombBox(arr);
 				BombBox bb= new BombBox(c,arr[3]);
 				parsedboard.vPutAt(arr[0], arr[1], bb);
@@ -251,13 +272,17 @@ public class BoardParser{
 		
 		while ( (line=getValidLine(file)) != null) {
 			unparsedints= line.split(",");
+			
 			if(unparsedints.length != 7)
 				throw new WrongNumberOfArgumentsException();
 			for(i=0; i<7 ;i++) {
-				paramcount= i;
+				paramcount= i+1;
 				parsedints[i]= Integer.parseInt(unparsedints[i]);
 			}
-			creationarray[parsedints[2]-1].create(parsedints);
+			if(parsedints[2]>0 && parsedints[2]<7)
+				creationarray[parsedints[2]-1].create(parsedints);
+			else
+				throw new WrongObjectTypeParam();
 		}
 		isPlayerPresent();
 	}
@@ -266,7 +291,6 @@ public class BoardParser{
 	/**
 	 * @throws IncorrectFileExtensionException 
 	 * @throws EmptyFileException 
-	 * @throws IOException 
 	 * @throws BoardParamIsGTExpectedException 
 	 * @throws BoardParamIsLTExpectedException 
 	 * @throws WrongNumberOfArgumentsException 
@@ -275,10 +299,14 @@ public class BoardParser{
 	 * @throws IllegalColorException 
 	 * @throws ParamNotZeroException 
 	 * @throws PlayerAlreadyDeclaredException 
+	 * @throws FileNotFoundException 
+	 * @throws EmptyArgumentException 
+	 * @throws ParamIsNegativeException 
+	 * @throws WrongObjectTypeParam 
 	 * 
 	 * 
 	 */
-	public void parse() throws IncorrectFileExtensionException, EmptyFileException, IOException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException, NumberFormatException, WrongNumberOfArgumentsException, MissingPlayerException, ParamNotZeroException, IllegalColorException, PlayerAlreadyDeclaredException {
+	public void parse() throws IncorrectFileExtensionException, EmptyFileException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException, NumberFormatException, WrongNumberOfArgumentsException, MissingPlayerException, ParamNotZeroException, IllegalColorException, PlayerAlreadyDeclaredException, FileNotFoundException, EmptyArgumentException, ParamIsNegativeException, WrongObjectTypeParam {
 		BufferedReader file;
 		String line;
 
