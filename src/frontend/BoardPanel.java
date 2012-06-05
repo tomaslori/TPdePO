@@ -43,6 +43,7 @@ public class BoardPanel extends JPanel {
 	 * Coloca una imagen en una celda determinada. Si la celda ya contenía otra imagen,
 	 * la reemplaza. Para que el cambio se vea reflejado es necesario invocar al metodo repaint.
 	 */
+
 	public void setImage(int row, int column, Image image) {
 		cells[row][column] = new BufferedImage(cellSize, cellSize, BufferedImage.TYPE_INT_ARGB);
 		cells[row][column].getGraphics().drawImage(image, 0, 0, null);

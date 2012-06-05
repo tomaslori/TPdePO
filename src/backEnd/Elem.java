@@ -2,16 +2,31 @@ package backEnd;
 
 public abstract class Elem {
 	
-	public boolean interact(Elem e, EmptyCell ec, Direction direction, int might){
-		return e.interact(this, ec, direction, might);
+	public boolean interact(Elem e, EmptyCell ec, Direction direction) {
+		return e.interact(this, ec, direction);
 	}
 	
-	public void interact(EmptyCell ec){
-		ec.interact(this);
+	
+	public boolean move(EmptyCell ec, Direction direction) {
+		return true;
+	}
+	
+
+
+	
+	public void doubleDispatching(EmptyCell cell) {
+		cell.interact(this);
+	}
+	
+	public void doubleDispatching(BlackHole bh){
+		bh.interact(this);
 	}
 
-	public boolean move(EmptyCell ec, Direction direction, int might){
-		return true;
+	
+	
+//TODO VER!!!
+	public boolean doubleDispatching(Box box, EmptyCell ec, Direction direction) {
+		return false;
 	}
 	
 }

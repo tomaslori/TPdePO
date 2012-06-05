@@ -1,23 +1,38 @@
 package backEnd;
 
-public class BlackHole extends EmptyCell{
+public class BlackHole extends Cell {
 	
-	public void setElem(Elem e){
+	public void setElem(Elem e) {
 	}
 
 	@Override
-	public boolean moveOnIt(EmptyCell ec, Direction direction, int might) {
-		interact(ec.getElem());
-		board.move(ec, board.calculateCell(direction, might));
+	public boolean moveOnIt(EmptyCell ec, Direction direction) {
+		Elem elem = ec.getElem();
+		elem.doubleDispatching(this);
+		board.swap(ec, this);
 		return true;
 	}
 	
+	public void interact(Player player) {
+		board.hasLost(this);
+	}
 	
-	public void interact(Player player){
-		board.hasLose(this);
+	public void interact(Box box){
+		board.deleteBox(box);
+		System.out.println("fasfnmaosfoi");
 	}
 	
 
+	
+	public String toString(){
+		return "5";
+	}
+
+	@Override
+	public void interact(Elem elem) {
+		// TODO Auto-generated method stub
+		
+	}
 	
 
 }

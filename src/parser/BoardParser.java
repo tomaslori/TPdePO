@@ -211,9 +211,9 @@ public class BoardParser{
 	 * @throws EmptyFileException 
 	 * @throws EmptyArgumentException 
 	 * @throws ParamIsNegativeException 
-	 * @throws WrongObjectTypeParam 
+	 * @throws WrongObjectTypeException 
 	 */
-	private void fillParsedBoard(BufferedReader file) throws WrongNumberOfArgumentsException, NumberFormatException, MissingPlayerException, ParamNotZeroException, IllegalColorException, PlayerAlreadyDeclaredException, EmptyFileException, EmptyArgumentException, ParamIsNegativeException, WrongObjectTypeParam {
+	private void fillParsedBoard(BufferedReader file) throws WrongNumberOfArgumentsException, NumberFormatException, MissingPlayerException, ParamNotZeroException, IllegalColorException, PlayerAlreadyDeclaredException, EmptyFileException, EmptyArgumentException, ParamIsNegativeException, WrongObjectTypeException {
 		int i;
 		String line;
 		String[] unparsedints;
@@ -282,7 +282,7 @@ public class BoardParser{
 			if(parsedints[2]>0 && parsedints[2]<7)
 				creationarray[parsedints[2]-1].create(parsedints);
 			else
-				throw new WrongObjectTypeParam();
+				throw new WrongObjectTypeException();
 		}
 		isPlayerPresent();
 	}
@@ -302,11 +302,11 @@ public class BoardParser{
 	 * @throws FileNotFoundException 
 	 * @throws EmptyArgumentException 
 	 * @throws ParamIsNegativeException 
-	 * @throws WrongObjectTypeParam 
+	 * @throws WrongObjectTypeException 
 	 * 
 	 * 
 	 */
-	public void parse() throws IncorrectFileExtensionException, EmptyFileException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException, NumberFormatException, WrongNumberOfArgumentsException, MissingPlayerException, ParamNotZeroException, IllegalColorException, PlayerAlreadyDeclaredException, FileNotFoundException, EmptyArgumentException, ParamIsNegativeException, WrongObjectTypeParam {
+	public void parse() throws IncorrectFileExtensionException, EmptyFileException, BoardParamIsLTExpectedException, BoardParamIsGTExpectedException, NumberFormatException, WrongNumberOfArgumentsException, MissingPlayerException, ParamNotZeroException, IllegalColorException, PlayerAlreadyDeclaredException, FileNotFoundException, EmptyArgumentException, ParamIsNegativeException, WrongObjectTypeException {
 		BufferedReader file;
 		String line;
 

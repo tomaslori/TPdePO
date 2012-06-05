@@ -2,7 +2,7 @@ package backEnd;
 
 import java.awt.Color;
 
-public class BombBox extends Box{
+public class BombBox extends Box {
 
 	private int times;
 	
@@ -12,17 +12,22 @@ public class BombBox extends Box{
 	}
 	
 	
-	public BombBox(int r, int g, int b, int times){
+	public BombBox(int r, int g, int b, int times) {
 		this(new Color(r,g,b), times);
 	}
 	
 	
 	@Override
-	public boolean move(EmptyCell ec, Direction direction, int might){
-		boolean aux = super.move(ec, direction, might);
-			if(--times == 0)
+	public boolean move(EmptyCell ec, Direction direction) {
+		boolean aux = super.move(ec, direction);
+		if(aux)
+			if(--times <= 0)
 				ec.alert(this);
-			return aux;
+		return aux;
+	}
+	
+	public int getTimes(){
+		return times;
 	}
 		
 }

@@ -1,53 +1,53 @@
 package backEnd;
 
-public class EmptyCell{
+public class EmptyCell extends Cell{
 
-	protected static Board board;
+	
 	protected Elem onIt = new EmptyElem();
 	
 	
-	public boolean moveOnIt(EmptyCell ec, Direction direction, int might) {
-		boolean aux = onIt.move(this, direction, might);
+	public boolean moveOnIt(EmptyCell ec, Direction direction) {
+		boolean aux = onIt.move(ec, direction);
 		if(aux){
 			interact(ec.getElem());
-			board.move(ec, board.calculateCell(direction, might));
+			board.swap(ec, this);			
 		}
 		return aux;
-		
 	}
 	
-	public Elem getElem(){
+	public Elem getElem() {
 		return onIt;
 	}
 	
-	public void setElem(Elem onIt){
+	public void setElem(Elem onIt) {
 		this.onIt = onIt;
 	}
 	
-	public static void setBoard(Board b){
-		board = b;
+	
+	
+	
+	public void interact(Box b) {
+		if(b.onTarget()){
+			board.decreaseRemainingTargets();
+			b.setOnTarget(false);
+		}
 	}
 	
-	public void interact(Elem e) {
-		e.interact(this);
-	}
 	
-	public void interact(Box b){
-		if(b.onTarget())
-			board.decreaseRemainingTargets();			
-	}
-	
-	public void interact(Player player){			
+	public void interact(Player player) {			
 	}
 
-	public boolean keepMoving(EmptyCell ec, Direction direction, int might) {
-		return moveOnIt(board.calculateCell(direction, might), direction, might);
+	public boolean keepMoving(EmptyCell ec, Direction direction) {
+		return board.calculateCell(direction, 2).moveOnIt((EmptyCell)board.calculateCell(direction, 1), direction);
 	}
 
 	public void alert(BombBox bb) {
 		board.hasWon();
-		board.hasLose(bb);
+		board.hasLost(bb);
 	}
 	
 	
+//	public void doubleDispatching(Elem elem) {
+//		elem.interact(this);
+//	}
 }
