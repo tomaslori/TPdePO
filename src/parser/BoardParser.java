@@ -20,8 +20,7 @@ public class BoardParser{
 
 	
 	/**
-	 * Devuelve la proxima linea que es valida en el file, es decir, linea que comienza con un caracter distitno 
-	 * de # y no es vacia. Ademas borra todo espacio o tabulacion si la linea era valida
+	 * Devuelve la proxima linea valida, borrando todo espacio o tabulacion.
 	 * @return String que sigue como linea valida en el file o null si el archivo termino 
 	 * @param file Archivo a analizar
 	 * @throws EmptyFileException 
@@ -48,9 +47,8 @@ public class BoardParser{
 		
 	
 	/**
-	 * Quita espacios y tabulaciones del string.
+	 * Quita espacios y tabulaciones.
 	 * @param line
-	 * @return	String sin espacios ni tabulaciones
 	 */
 	private String clearSpaceAndTabs(String line) {
 		line = line.replace(" ","");
@@ -60,11 +58,7 @@ public class BoardParser{
 	
 	
 	/**
-	 * 
-	 * @param line
-	 * @param x
-	 * @param y
-	 * @return
+	 * Valida el tamaño del tablero.
 	 * @throws WrongNumberOfBoardArgumentsException 
 	 * @throws BoardParamIsLTExpectedException 
 	 * @throws BoardParamIsGTExpectedException 
@@ -90,9 +84,7 @@ public class BoardParser{
 	
 	
 	/**
-	 * 
-	 * @param line
-	 * @return
+	 * Valida la linea en que se crea de tablero y lo construye. 
 	 * @throws BoardParamIsGTExpectedException 
 	 * @throws BoardParamIsLTExpectedException 
 	 * @throws WrongNumberOfBoardArgumentsException 
@@ -115,36 +107,50 @@ public class BoardParser{
 		return board;
 	}
 	
-	
 	/**
-	 * 
-	 * @return
+	 * Siempre invocar el metodo parse antes de getParsedBoard, ya que de lo contrario el tablero no estara parseado.
+	 * @return el tablero.
 	 */
 	public Board getParsedBoard() {
 		return parsedboard;
 	}
 	
+	/**
+	 * Valida la presencia del jugador.
+	 * @throws MissingPlayerException
+	 */
 	private void isPlayerPresent() throws MissingPlayerException {
 		if (! parsedboard.isPlayerPresent())
 			throw new MissingPlayerException();
 	}
 	
+	/**
+	 * Valida la ausencia del jugador.
+	 * @throws PlayerAlreadyDeclaredException
+	 */
 	private void isPlayerAbscent() throws PlayerAlreadyDeclaredException {
 		if (parsedboard.isPlayerPresent())
 			throw new PlayerAlreadyDeclaredException();
 	}
 	
+	/**
+	 * @return el numero de parametro en el que se encontro el error.
+	 */
 	public int getParamNumber() {
 		return paramcount;
 	}
 	
+	/**
+	 * @return el numero de linea en el que se encontro el error.
+	 */
 	public int getLineNumber() {
 		return linecount;
 	}
 	
 	/**
+	 * Valida la linea que define un jugador.
+	 * @param arr contiene los datos de creacion ya parseados.
 	 * @throws ParamNotZeroException 
-	 * 
 	 */
 	private void validatePlayer(int[] arr) throws ParamNotZeroException {
 		int[] zeros = new int[4];
@@ -155,6 +161,14 @@ public class BoardParser{
 		validateZeroFilledArguments(arr, zeros);
 	}
 	
+	/**
+	 * Valida la linea que define una caja.
+	 * @param arr contiene los datos de creacion ya parseados.
+	 * @return el color que posee la caja.
+	 * @throws ParamNotZeroException
+	 * @throws IllegalColorException
+	 * @throws ParamIsNegativeException
+	 */
 	private Color validateBox(int[] arr) throws ParamNotZeroException, IllegalColorException, ParamIsNegativeException {
 
 		if(arr[3] != 0) {
@@ -164,21 +178,47 @@ public class BoardParser{
 		return validateBombBox(arr);
 	}
 	
+	/**
+	 * Valida la linea que define un destino.
+	 * @param arr contiene los datos de creacion ya parseados.
+	 * @return el color que posee el destino.
+	 * @throws ParamNotZeroException
+	 * @throws IllegalColorException
+	 * @throws ParamIsNegativeException
+	 */
 	private Color validateTarget(int[] arr) throws ParamNotZeroException, IllegalColorException, ParamIsNegativeException {
 	
 		return validateBox(arr);
 	}
 	
+	/**
+	 * Valida la linea que define una pared.
+	 * @param arr contiene los datos de creacion ya parseados.
+	 * @throws ParamNotZeroException
+	 */
 	private void validateWall(int[] arr) throws ParamNotZeroException {
 	
 		validatePlayer(arr);
 	}
 	
+	/**
+	 * Valida la linea que define un pozo.
+	 * @param arr contiene los datos de creacion ya parseados.
+	 * @throws ParamNotZeroException
+	 */
 	private void validateBlackHole(int[] arr) throws ParamNotZeroException {
 		
 		validateWall(arr);
 	}
 	
+	/**
+	 * Valida la linea que define una caja bomba.
+	 * @param arr contiene los datos de creacion ya parseados.
+	 * @return el color que posee la caja bomba.
+	 * @throws ParamNotZeroException
+	 * @throws IllegalColorException
+	 * @throws ParamIsNegativeException
+	 */
 	private Color validateBombBox(int[] arr) throws ParamNotZeroException, IllegalColorException, ParamIsNegativeException {
 		Color c;
 		try{ c=new Color(arr[4], arr[5], arr[6]); }
@@ -191,6 +231,12 @@ public class BoardParser{
 	}
 		
 		
+	/**
+	 * Valida que haya 0 en los datos de creacion ya parseados, en los indices elegidos.
+	 * @param arr contiene los datos de creacion ya parseados.
+	 * @param indexes contiene los indices en los cuales los datos deben tener un 0.
+	 * @throws ParamNotZeroException
+	 */
 	private void validateZeroFilledArguments(int[] arr, int[] indexes) throws ParamNotZeroException {
 		int i;
 	
@@ -202,8 +248,8 @@ public class BoardParser{
 	}
 		
 	/**
-	 * 
-	 * @param file
+	 * Rellena el tablero que se creo previamente, con el jugador, las cajas y demas, siguiendo lo descripto en el archivo.
+	 * @param file archivo inicial menos la linea de creacion del tablero.
 	 * @throws WrongNumberOfArgumentsException 
 	 * @throws NumberFormatException 
 	 * @throws MissingPlayerException 
@@ -288,7 +334,7 @@ public class BoardParser{
 	}
 	
 	
-	/**
+	/** Parsea el archivo. Debe ser llamada antes de invocar getParsedBoard(), ya que de lo contrario el tablero no estara parseado.
 	 * @throws IncorrectFileExtensionException 
 	 * @throws EmptyFileException 
 	 * @throws BoardParamIsGTExpectedException 
